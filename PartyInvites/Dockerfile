@@ -1,11 +1,20 @@
-FROM microsoft/dotnet:latest
-COPY . /app
+FROM microsoft/aspnetcore:2.0 AS base
 WORKDIR /app
- 
-RUN ["dotnet", "restore"]
-RUN ["dotnet", "build"]
- 
-EXPOSE 5000/tcp
-ENV ASPNETCORE_URLS http://*:5000
- 
-ENTRYPOINT ["dotnet", "run"]
+EXPOSE 80
+
+FROM microsoft/aspnetcore-build:2.0 AS build
+WORKDIR /src
+COPY PartyInvites.sln ./
+COPY PartyInvites/PartyInvites.csproj PartyInvites/
+RUN dotnet restore -nowarn:msb3202,nu1503
+COPY . .
+WORKDIR /src/PartyInvites
+RUN dotnet build -c Release -o /app
+
+FROM build AS publish
+RUN dotnet publish -c Release -o /app
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app .
+ENTRYPOINT ["dotnet", "PartyInvites.dll"]
