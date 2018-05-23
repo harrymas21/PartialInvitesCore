@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PartyInvites.AutomapperProfiles;
 
 namespace PartyInvites
 {
@@ -22,6 +24,7 @@ namespace PartyInvites
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddAutoMapper(x => x.AddProfile(new PartyInvitesProfile()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

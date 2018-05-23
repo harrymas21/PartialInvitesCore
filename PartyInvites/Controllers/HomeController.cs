@@ -1,16 +1,32 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using PartyInvites.DTO;
+using PartyInvites.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using PartyInvites.Models;
-using PartyInvites.Repo;
 
 namespace PartyInvites.Controllers
 {
     public class HomeController : Controller
     {
+        private IMongoDatabase mongoDatabase;
+
+        private readonly IMapper _iMapper;
+
+        public HomeController(IMapper iMapper)
+        {
+            _iMapper = iMapper;
+        }
+        //Generic method to get the mongodb database details  
+        public IMongoDatabase GetMongoDatabase()
+        {
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            return mongoClient.GetDatabase("PartyInvitesDB");
+        }
+
         public IActionResult Index()
         {
             int hour = DateTime.Now.Hour;
@@ -27,24 +43,37 @@ namespace PartyInvites.Controllers
         }
 
         [HttpPost]
-        public ViewResult RsvpForm(GuestResponse guestResponse)
+        public ViewResult RsvpForm(GuestResponseDTO guestResponseDTO)
         {
             if (ModelState.IsValid)
             {
-                Repository.AddResponse(guestResponse);
+                var guestResponse = _iMapper.Map<GuestResponse>(guestResponseDTO);
 
-                return View("Thanks", guestResponse);
+                mongoDatabase = GetMongoDatabase();
+
+                mongoDatabase.GetCollection<GuestResponse>("PartyInvites").InsertOne(guestResponse);
+
+                return View("Thanks", guestResponseDTO);
             }
             else
             {
                 //there's some validation error
-                return View("RsvpForm", guestResponse);
+                return View("RsvpForm", guestResponseDTO);
             }
         }
 
         public ViewResult ListResponses()
         {
-            return View(Repository.Responses.Where(r => r.WillAttend == true));
+
+            //Get the database connection  
+            mongoDatabase = GetMongoDatabase();
+
+            //fetch the details from CustomerDB and pass into view  
+            var result = mongoDatabase.GetCollection<GuestResponse>("PartyInvites").Find(FilterDefinition<GuestResponse>.Empty).ToList();
+
+            var guestResponseDTOList = _iMapper.Map<List<GuestResponseDTO>>(result);
+
+            return View(guestResponseDTOList);
         }
 
         public IActionResult Error()

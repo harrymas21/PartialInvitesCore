@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace PartyInvites.Models
 {
     public class GuestResponse
     {
-        [Required(ErrorMessage = "Please enter your name")]
+        [BsonId]
+        public ObjectId Id { get; set; }
+
+        [BsonElement]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Please enter your email address")]
-        [RegularExpression(".+\\@.+\\..+", ErrorMessage = "Please enter a valid email address")]
+        [BsonElement]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Please enter your name")]
+        [BsonElement]
         public string Phone { get; set; }
 
-        [Required(ErrorMessage = "Please specify whether you will attend")]
+        [BsonElement]
         public bool? WillAttend { get; set; }
     }
 }
