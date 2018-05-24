@@ -25,7 +25,7 @@ namespace PartyInvites.Controllers
         public IMongoDatabase GetMongoDatabase()
         {
             MongoClientSettings settings = new MongoClientSettings();
-            settings.Server = new MongoServerAddress("127.0.0.1", 27017);
+            settings.Server = new MongoServerAddress("192.168.1.120", 27017);
             var mongoClient = new MongoClient(settings);
             return mongoClient.GetDatabase("PartyInvitesDB");
         }
