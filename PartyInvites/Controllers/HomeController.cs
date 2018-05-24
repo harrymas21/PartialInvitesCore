@@ -19,11 +19,14 @@ namespace PartyInvites.Controllers
         public HomeController(IMapper iMapper)
         {
             _iMapper = iMapper;
+
         }
-        //Generic method to get the mongodb database details  
+        //Generic method to get the mongodb database details
         public IMongoDatabase GetMongoDatabase()
         {
-            MongoClient mongo = new MongoClient("127.0.0.1", 27017);
+            MongoClientSettings settings = new MongoClientSettings();
+            settings.Server = new MongoServerAddress("127.0.0.1", 27017);
+            var mongoClient = new MongoClient(settings);
             return mongoClient.GetDatabase("PartyInvitesDB");
         }
 
