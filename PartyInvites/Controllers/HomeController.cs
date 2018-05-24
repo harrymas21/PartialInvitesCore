@@ -23,7 +23,7 @@ namespace PartyInvites.Controllers
         //Generic method to get the mongodb database details  
         public IMongoDatabase GetMongoDatabase()
         {
-            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            MongoClient mongo = new MongoClient("127.0.0.1", 27017);
             return mongoClient.GetDatabase("PartyInvitesDB");
         }
 
