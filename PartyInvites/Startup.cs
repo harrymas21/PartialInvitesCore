@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PartyInvites.AutomapperProfiles;
+using PartyInvites.RabbitProducer;
 
 namespace PartyInvites
 {
@@ -25,6 +26,9 @@ namespace PartyInvites
         {
             services.AddMvc();
             services.AddAutoMapper(x => x.AddProfile(new PartyInvitesProfile()));
+
+            //my services
+            services.AddTransient<IProducer, Producer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

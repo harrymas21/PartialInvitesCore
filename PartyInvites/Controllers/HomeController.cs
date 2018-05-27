@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using PartyInvites.DTO;
+using PartyInvites.Infrastructure;
 using PartyInvites.Models;
+using PartyInvites.RabbitProducer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,18 +18,22 @@ namespace PartyInvites.Controllers
 
         private readonly IMapper _iMapper;
 
-        public HomeController(IMapper iMapper)
+        private readonly IProducer _producer;
+
+        public HomeController(IMapper iMapper, IProducer producer)
         {
             _iMapper = iMapper;
+
+            _producer = producer;
 
         }
         //Generic method to get the mongodb database details
         public IMongoDatabase GetMongoDatabase()
         {
             MongoClientSettings settings = new MongoClientSettings();
-            settings.Server = new MongoServerAddress("192.168.1.120", 27017);
+            settings.Server = new MongoServerAddress(DefaultSettings.Instance.Hostname, 27017);
             var mongoClient = new MongoClient(settings);
-            return mongoClient.GetDatabase("PartyInvitesDB");
+            return mongoClient.GetDatabase(DefaultSettings.Instance.Database);
         }
 
         public IActionResult Index()
@@ -54,7 +60,9 @@ namespace PartyInvites.Controllers
 
                 mongoDatabase = GetMongoDatabase();
 
-                mongoDatabase.GetCollection<GuestResponse>("PartyInvites").InsertOne(guestResponse);
+                mongoDatabase.GetCollection<GuestResponse>(DefaultSettings.Instance.Collection).InsertOne(guestResponse);
+
+                _producer.SendMessage(guestResponseDTO.Email);
 
                 return View("Thanks", guestResponseDTO);
             }
@@ -67,12 +75,11 @@ namespace PartyInvites.Controllers
 
         public ViewResult ListResponses()
         {
-
             //Get the database connection  
             mongoDatabase = GetMongoDatabase();
 
             //fetch the details from CustomerDB and pass into view  
-            var result = mongoDatabase.GetCollection<GuestResponse>("PartyInvites").Find(FilterDefinition<GuestResponse>.Empty).ToList();
+            var result = mongoDatabase.GetCollection<GuestResponse>(DefaultSettings.Instance.Collection).Find(FilterDefinition<GuestResponse>.Empty).ToList();
 
             var guestResponseDTOList = _iMapper.Map<List<GuestResponseDTO>>(result);
 
