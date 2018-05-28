@@ -9,7 +9,15 @@ namespace PartyInvites.RabbitProducer
     {
         public void SendMessage(string message)
         {
-            var factory = new ConnectionFactory() { HostName = DefaultSettings.Instance.Hostname, Port = 5672, UserName = "guest", Password = "guest" };
+            var factory = new ConnectionFactory()
+            {
+                HostName = DefaultSettings.Instance.Hostname,
+                Port = DefaultSettings.Instance.Port,
+                UserName = DefaultSettings.Instance.UserName,
+                Password = DefaultSettings.Instance.Password,
+                VirtualHost = DefaultSettings.Instance.VirtualHost,
+                ContinuationTimeout = new TimeSpan(10,0,0,0)
+            };
 
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
