@@ -11,7 +11,7 @@ namespace PartyInvites.EmailService
     {
         public void Main()
         {
-            var factory = new ConnectionFactory() { HostName = "192.168.1.120" };
+            var factory = new ConnectionFactory() { HostName = "192.168.1.120", Port = 5672, UserName = "guest", Password = "guest" };
 
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
