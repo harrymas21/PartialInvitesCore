@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using PartyInvites.DTO;
-using PartyInvites.Infrastructure;
 using PartyInvites.Models;
 using PartyInvites.RabbitProducer;
 using System;

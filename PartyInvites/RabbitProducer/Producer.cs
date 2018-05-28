@@ -1,4 +1,4 @@
-﻿using PartyInvites.Infrastructure;
+﻿using Infrastructure;
 using RabbitMQ.Client;
 using System;
 using System.Text;
