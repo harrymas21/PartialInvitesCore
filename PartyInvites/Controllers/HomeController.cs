@@ -62,7 +62,14 @@ namespace PartyInvites.Controllers
 
                 mongoDatabase.GetCollection<GuestResponse>(DefaultSettings.Instance.Collection).InsertOne(guestResponse);
 
-                _producer.SendMessage(guestResponseDTO.Email);
+                try
+                {
+                    _producer.SendMessage(guestResponseDTO.Email);
+                }
+                catch
+                {
+                    throw new InvalidOperationException("Something happened, unable to send e-mail!");
+                }
 
                 return View("Thanks", guestResponseDTO);
             }
